@@ -1,0 +1,63 @@
+import React, { useState } from "react";
+import { Input, Button, Card, CardContent } from "@/components/ui";
+import axios from "axios";
+
+export default function CaptionGenerator() {
+  const [topic, setTopic] = useState("");
+  const [captions, setCaptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [hashtags, setHashtags] = useState([]);
+
+  const generateCaptions = async () => {
+    if (topic.trim() === "") return;
+    setLoading(true);
+    
+    try {
+      const response = await axios.post("https://api.example.com/generate-captions", { topic });
+      setCaptions(response.data.captions);
+      setHashtags(response.data.hashtags);
+    } catch (error) {
+      setCaptions([
+        `"${topic}" is the mood today. 🌟 #Inspiration #DailyVibes`,
+        `Feeling ${topic} and unstoppable! 🚀 #Winning #Success`,
+        `Just a little bit of ${topic} energy to start the day! 💡 #GoodVibesOnly`,
+        `The secret ingredient? ${topic}. 💯 #MindsetMatters #Grind` 
+      ]);
+      setHashtags(["#Trending", "#SocialMediaGrowth", "#ViralContent"]);
+    }
+    
+    setLoading(false);
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+      <Card className="w-full max-w-md p-6 bg-white shadow-lg rounded-lg">
+        <CardContent>
+          <h2 className="text-xl font-bold mb-4">AI Caption & Hashtag Generator</h2>
+          <Input
+            type="text"
+            placeholder="Enter a topic (e.g., motivation, love)"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            className="w-full p-2 border rounded mb-4"
+          />
+          <Button onClick={generateCaptions} className="w-full bg-blue-600 text-white p-2 rounded" disabled={loading}>
+            {loading ? "Generating..." : "Generate Captions & Hashtags"}
+          </Button>
+          {captions.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold">Generated Captions:</h3>
+              <ul className="mt-2">
+                {captions.map((caption, index) => (
+                  <li key={index} className="p-2 bg-gray-200 rounded my-2">{caption}</li>
+                ))}
+              </ul>
+              <h3 className="text-lg font-semibold mt-4">Suggested Hashtags:</h3>
+              <p className="p-2 bg-gray-200 rounded">{hashtags.join(" ")}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
